@@ -7,7 +7,9 @@ URL: https://github.com/scitokens/xrootd-scitokens
 
 # Generated from:
 # git archive v%{version} --prefix=xrootd-scitokens-%{version}/ | gzip -7 > ~/rpmbuild/SOURCES/xrootd-scitokens-%{version}.tar.gz
+# ./make-vendor-archive v${version} ~/rpmbuild/SOURCES/xrootd-scitokens-%{version}-vendor.tar.gz
 Source0: %{name}-%{version}.tar.gz
+Source1: %{name}-%{version}-vendor.tar.gz
 
 BuildRequires: gcc-c++
 BuildRequires: cmake
@@ -19,6 +21,7 @@ SciTokens authentication plugin for XRootD
 
 %prep
 %setup -q
+%setup -q -T -D -a 1
 
 %build
 mkdir build

@@ -1,0 +1,22 @@
+#!/bin/bash -e
+
+prog=${0##*/}
+repo=$(git rev-parse --show-toplevel)
+project=${repo##*/}
+branch=${1?Need branch/tag (e.g. master, v1.2.3)}
+outfile=${2?Need output tarball file (e.g. $project-vendor.tar.gz)}
+if [[ $outfile != /* ]]; then
+    outfile=$(pwd -P)/$outfile
+fi
+
+# mktemp that works on OSX too: https://stackoverflow.com/a/31397073
+tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/$prog.XXXXXX")
+cd "$tmpdir"
+trap 'rm -rf "$tmpdir"' ERR EXIT
+
+git clone "$repo"
+cd "$project"
+git checkout "$branch"
+git submodule update --init --recursive -- vendor/
+tar --exclude-vcs -c vendor/ | gzip -n9 > "$outfile"
+

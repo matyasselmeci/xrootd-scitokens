@@ -25,6 +25,7 @@ package_version=`grep Version xrootd-scitokens/rpm/xrootd-scitokens.spec | awk '
 pushd xrootd-scitokens
 git archive --format=tar --prefix=xrootd-scitokens-${package_version}/ HEAD | \
     gzip > /tmp/rpmbuild/SOURCES/xrootd-scitokens-${package_version}.tar.gz
+./make-vendor-archive HEAD /tmp/rpmbuild/SOURCES/xrootd-scitokens-${package_version}-vendor.tar.gz
 popd
 
 # Build the RPM
