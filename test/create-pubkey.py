@@ -1,6 +1,9 @@
 import urllib2
 import argparse
 import json
+import os
+import sys
+import logging
 
 import scitokens
 
@@ -13,7 +16,11 @@ def main():
     parser.add_argument('--aud', dest='aud', help="Insert an audience")
     parser.add_argument('pubjwk', metavar='p', type=str,
                     help='The jwks public key')
+    parser.add_argument('--nolog', dest='log', action='store_false', help="Do not print logs and token.")
     args = parser.parse_args()
+
+    if args.log:
+        logging.basicConfig(level=logging.INFO)
     
     private_key = None
     with open('private.pem', 'rb') as key_file:
@@ -38,9 +45,22 @@ def main():
     
     token_str = token.serialize(issuer="https://localhost")
     headers = {"Authorization": "Bearer {0}".format(token_str)}
-    #print token_str
-    request = urllib2.Request("http://localhost:8080/tmp/random.txt", headers=headers)
-    contents = urllib2.urlopen(request).read()
+    try:
+        request = urllib2.Request("http://localhost:8080/tmp/random.txt", headers=headers)
+        contents = urllib2.urlopen(request).read()
+    except urllib2.HTTPError:
+        if args.log:
+            for logdir in ["/var/log/httpd", "/var/log/xrootd/http"]:
+                if not os.path.isdir(logdir): continue
+                for fn in os.listdir(logdir):
+                    fp = logdir+"/"+fn
+                    if os.path.isfile(fp) and os.path.getsize(fp) > 0:
+                        print >>sys.stderr, "-" * len(fp)
+                        print >>sys.stderr, fp
+                        print >>sys.stderr, "-" * len(fp)
+                        os.system("tail -n 50 " + fp + " >&2")
+                        print >>sys.stderr
+        raise
     print contents,
     
     #request = urllib2.Request("http://localhost:8080/tmp/random.txt")

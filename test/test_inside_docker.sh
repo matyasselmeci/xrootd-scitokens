@@ -118,7 +118,7 @@ if [ "$py_output" != "$NEW_UUID" ]; then
 fi
 
 # Test sending no aud when an audience is configured
-if python xrootd-scitokens/test/create-pubkey.py /var/www/html/oauth2/certs; then
+if python xrootd-scitokens/test/create-pubkey.py /var/www/html/oauth2/certs --nolog; then
   exit 1
 fi
 
@@ -142,12 +142,12 @@ if [ "$py_output" != "$NEW_UUID" ]; then
 fi
 
 # Test sending no aud when an audience is configured
-if python xrootd-scitokens/test/create-pubkey.py /var/www/html/oauth2/certs; then
+if python xrootd-scitokens/test/create-pubkey.py /var/www/html/oauth2/certs --nolog; then
   exit 1
 fi
 
 # Test sending wrong aud when an audience is configured
-if python xrootd-scitokens/test/create-pubkey.py --aud="wrong.com" /var/www/html/oauth2/certs; then
+if python xrootd-scitokens/test/create-pubkey.py --aud="wrong.com" /var/www/html/oauth2/certs --nolog; then
   exit 1
 fi
 
